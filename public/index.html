@@ -1,0 +1,46 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <h1>SSE Status: <span id="status"></span></h1>
+    <h3>Server Active Connection: <span id="data"></span></h3>
+    <script>
+        if (!!window.EventSource) {
+            const source = new EventSource('/active')
+            const status = document.getElementById('status')
+
+            source.addEventListener("message", function (e) {
+                document.getElementById('data').innerHTML = e.data
+            })
+
+            source.addEventListener('open', function (e) {
+                status.innerHTML = "Connected";
+                status.style.color = "green";
+            })
+
+            source.addEventListener('error', function (e) {
+                if (e.eventPhase == EventSource.CLOSED)
+                    source.close()
+                if (e.target.readyState == EventSource.CLOSED) {
+                    status.innerHTML = "Disconnected"
+                    status.style.color = "red";
+                }
+                else if (e.target.readyState == EventSource.CONNECTING) {
+                    status.innerHTML = "Connecting..."
+                    status.style.color = "yellow";
+                }
+            })
+        } else {
+            console.log("Your browser doesn't support SSE")
+        }
+    </script>
+</body>
+
+</html>
